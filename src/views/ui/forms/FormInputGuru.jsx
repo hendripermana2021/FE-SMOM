@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import serverDev from "../../../Server";
+import { createBrowserHistory } from "history";
 
 const FormInputGuru = ({ kelas }) => {
   const [show, setShow] = useState(false);
@@ -20,6 +21,7 @@ const FormInputGuru = ({ kelas }) => {
   const [confPassword, setConfPassword] = useState("");
 
   const navigate = useNavigate();
+  const history = createBrowserHistory();
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
@@ -110,6 +112,7 @@ const FormInputGuru = ({ kelas }) => {
         setConfPassword("");
         setIsLoading(false);
         navigate("/guru");
+        history.go(0);
         handleClose();
       }
     } catch (error) {

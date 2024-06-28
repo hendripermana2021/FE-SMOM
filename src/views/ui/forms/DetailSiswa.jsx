@@ -38,6 +38,7 @@ const DetailSiswa = (props) => {
                 type="text"
                 placeholder={siswaprops.name_siswa}
                 label={siswaprops.name_siswa}
+                readOnly
               />
             </Form.Group>
 
@@ -47,6 +48,7 @@ const DetailSiswa = (props) => {
                 type="text"
                 placeholder={siswaprops.sex}
                 label={siswaprops.sex}
+                readOnly
               />
             </Form.Group>
 
@@ -56,6 +58,7 @@ const DetailSiswa = (props) => {
                 type="text"
                 placeholder={siswaprops.fathername}
                 label={siswaprops.fathername}
+                readOnly
               />
             </Form.Group>
 
@@ -65,6 +68,7 @@ const DetailSiswa = (props) => {
                 type="text"
                 placeholder={siswaprops.mothername}
                 label={siswaprops.mothername}
+                readOnly
               />
             </Form.Group>
 
@@ -74,6 +78,7 @@ const DetailSiswa = (props) => {
                 type="text"
                 placeholder={siswaprops.email}
                 label={siswaprops.email}
+                readOnly
               />
             </Form.Group>
 
@@ -83,6 +88,7 @@ const DetailSiswa = (props) => {
                 type="text"
                 placeholder={siswaprops.kelas.name_class}
                 label={siswaprops.kelas.name_class}
+                readOnly
               />
             </Form.Group>
           </Form>

@@ -1,7 +1,6 @@
 import { Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-import { Badge } from "react-bootstrap";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 import $ from "jquery";
 import "datatables.net-dt";
@@ -9,46 +8,30 @@ import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import serverDev from "../../Server";
-import FormInputSiswa from "./forms/FormInputSiswa";
-import DetailSiswa from "./forms/DetailSiswa";
-import UpdateDataSiswa from "./forms/UpdateDataSiswa";
+import FormInputKelas from "./forms/FormInputKelas";
+import DetailKelas from "./forms/DetailKelas";
+import UpdateDataKelas from "./forms/UpdateDataKelas";
 
-const SiswaTables = () => {
-  const [Siswa, setSiswa] = useState([]);
+const ClassTable = () => {
   const [loading, setLoading] = useState(true);
   const [kelas, setKelas] = useState([]);
+  const [guru, setGuru] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
-    if (!$.fn.DataTable.isDataTable("#tablesiswa")) {
+    if (!$.fn.DataTable.isDataTable("#tableguru")) {
       $(document).ready(() => {
         const tableInterval = setInterval(() => {
-          if ($("#tablesiswa").is(":visible")) {
+          if ($("#tableguru").is(":visible")) {
             clearInterval(tableInterval);
-            $("#tablesiswa").DataTable();
+            $("#tableguru").DataTable();
           }
         }, 1000);
       });
     }
     getKelas();
-    getSiswa();
+    getGuru();
   }, []);
-
-  const getSiswa = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${serverDev}siswa`, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
-      });
-      setSiswa(response.data.data);
-    } catch (error) {
-      console.error("Error fetching siswa data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getKelas = async () => {
     setLoading(true);
@@ -60,7 +43,23 @@ const SiswaTables = () => {
       });
       setKelas(response.data.data);
     } catch (error) {
-      console.error("Error fetching class data:", error);
+      console.error("Error fetching kelas data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getGuru = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${serverDev}guru`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+      });
+      setGuru(response.data.data);
+    } catch (error) {
+      console.error("Error fetching kelas data:", error);
     } finally {
       setLoading(false);
     }
@@ -68,25 +67,25 @@ const SiswaTables = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedRows(Siswa.map((siswa) => siswa.id));
+      setSelectedRows(kelas.map((kelas) => kelas.id));
     } else {
       setSelectedRows([]);
     }
   };
 
-  const handleSelectRow = (event, siswaId) => {
+  const handleSelectRow = (event, kelasId) => {
     if (event.target.checked) {
-      setSelectedRows((prevSelectedRows) => [...prevSelectedRows, siswaId]);
+      setSelectedRows((prevSelectedRows) => [...prevSelectedRows, kelasId]);
     } else {
       setSelectedRows((prevSelectedRows) =>
-        prevSelectedRows.filter((id) => id !== siswaId)
+        prevSelectedRows.filter((id) => id !== kelasId)
       );
     }
   };
 
-  const deleteSelectedSiswa = async () => {
+  const deleteSelectedKelas = async () => {
     if (selectedRows.length === 0) {
-      Swal.fire("No selection", "Please select siswa(s) to delete", "info");
+      Swal.fire("No selection", "Please select class to delete", "info");
       return;
     }
 
@@ -102,8 +101,8 @@ const SiswaTables = () => {
       if (result.isConfirmed) {
         try {
           await Promise.all(
-            selectedRows.map(async (siswaId) => {
-              await axios.delete(`${serverDev}siswa/delete/${siswaId}`, {
+            selectedRows.map(async (kelasId) => {
+              await axios.delete(`${serverDev}class/delete/${kelasId}`, {
                 headers: {
                   Authorization: `Bearer ${sessionStorage.getItem(
                     "accessToken"
@@ -114,10 +113,10 @@ const SiswaTables = () => {
           );
           Swal.fire(
             "Deleted!",
-            "The selected siswa(s) have been deleted.",
+            "The selected class have been deleted.",
             "success"
           );
-          getSiswa(); // Refresh the data
+          getKelas(); // Refresh the data
           setSelectedRows([]);
         } catch (error) {
           console.error("Error deleting siswa data:", error);
@@ -139,10 +138,10 @@ const SiswaTables = () => {
         </CardTitle>
         <CardBody>
           <ButtonGroup aria-label="Basic example">
-            <FormInputSiswa kelas={kelas} />
+            <FormInputKelas guru={guru} />
             <button
               className="btn btn-danger"
-              onClick={deleteSelectedSiswa}
+              onClick={deleteSelectedKelas}
               disabled={selectedRows.length === 0}
             >
               Delete Selected
@@ -153,7 +152,7 @@ const SiswaTables = () => {
           <CardSubtitle className="mb-2 text-muted" tag="h6">
             Jumlah Siswa
           </CardSubtitle>
-          <Table className="table table-hover" id="tablesiswa" responsive>
+          <Table className="table table-hover" id="tableguru" responsive>
             <thead>
               <tr>
                 <th>
@@ -161,19 +160,13 @@ const SiswaTables = () => {
                     type="checkbox"
                     onChange={handleSelectAll}
                     checked={
-                      selectedRows.length === Siswa.length && Siswa.length > 0
+                      selectedRows.length === kelas.length && kelas.length > 0
                     }
                   />
                 </th>
                 <th>No</th>
-                <th>Nama Siswa</th>
-                <th>Jenis Kelamin</th>
-                <th>Nama Ayah</th>
-                <th>Nama Ibu</th>
-                <th>Status</th>
-                <th>Kelas</th>
-                <th>Email</th>
-                <th>Password</th>
+                <th>Nama Kelas</th>
+                <th>Wali Kelas</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -182,39 +175,23 @@ const SiswaTables = () => {
                 <tr>
                   <td colSpan="11">Loading...</td>
                 </tr>
-              ) : Siswa.length === 0 ? (
+              ) : kelas.length === 0 ? (
                 <tr>
-                  <td colSpan="11">No Data Siswa available</td>
+                  <td colSpan="11">No Data kelas available</td>
                 </tr>
               ) : (
-                Siswa.map((siswas, index) => (
-                  <tr key={siswas.id}>
+                kelas.map((kelases, index) => (
+                  <tr key={kelases.id}>
                     <td>
                       <input
                         type="checkbox"
-                        checked={selectedRows.includes(siswas.id)}
-                        onChange={(e) => handleSelectRow(e, siswas.id)}
+                        checked={selectedRows.includes(kelases.id)}
+                        onChange={(e) => handleSelectRow(e, kelases.id)}
                       />
                     </td>
                     <td>{index + 1}</td>
-                    <td>{siswas.name_siswa}</td>
-                    <td>
-                      <Badge bg={siswas.sex === "L" ? "primary" : "success"}>
-                        {siswas.sex}
-                      </Badge>
-                    </td>
-                    <td>{siswas.fathername}</td>
-                    <td>{siswas.mothername}</td>
-                    <td>
-                      <Badge
-                        bg={siswas.status === "Active" ? "success" : "danger"}
-                      >
-                        {siswas.status}
-                      </Badge>
-                    </td>
-                    <td>{siswas.kelas.name_class}</td>
-                    <td>{siswas.email}</td>
-                    <td>{siswas.real_password}</td>
+                    <td>{kelases.name_class}</td>
+                    <td>{kelases.wali_kelas.name_guru}</td>
                     <td>
                       <DropdownButton
                         as={ButtonGroup}
@@ -224,11 +201,11 @@ const SiswaTables = () => {
                         variant="secondary"
                         title=""
                       >
-                        <DetailSiswa siswaprops={siswas} />
-                        <UpdateDataSiswa classes={kelas} student={siswas} />
+                        <DetailKelas kelasprops={kelases} />
+                        <UpdateDataKelas kelasprops={kelases} teachers={guru} />
                         <button
                           className="dropdown-item"
-                          onClick={() => deleteSelectedSiswa(siswas)}
+                          onClick={() => deleteSelectedKelas(kelases)}
                         >
                           <i className="ti-trash menu-icon me-2"></i>Delete
                         </button>
@@ -245,4 +222,4 @@ const SiswaTables = () => {
   );
 };
 
-export default SiswaTables;
+export default ClassTable;

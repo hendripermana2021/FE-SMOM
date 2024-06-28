@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import serverDev from "../../../Server";
+import { createBrowserHistory } from "history";
 
 const UpdateDataGuru = ({ teacher }) => {
   const [show, setShow] = useState(false);
@@ -22,6 +23,7 @@ const UpdateDataGuru = ({ teacher }) => {
   const [confPassword, setConfPassword] = useState(teacher.real_password || "");
 
   const navigate = useNavigate();
+  const history = createBrowserHistory();
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
@@ -112,6 +114,7 @@ const UpdateDataGuru = ({ teacher }) => {
         setIsLoading(false);
         navigate("/guru");
         handleClose();
+        history.go(0);
       }
     } catch (error) {
       console.error("Error updating teacher data:", error);

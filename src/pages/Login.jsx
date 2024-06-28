@@ -72,7 +72,7 @@ const Login = () => {
             <img src={Logo} alt="" />
           </div>
           <div className="login-center">
-            <h2>Welcome back!</h2>
+            <h2>Login Page</h2>
             <p>Please enter your details</p>
             <form onSubmit={Login}>
               <input
@@ -107,14 +107,6 @@ const Login = () => {
                 )}
               </div>
 
-              <div className="login-center-options">
-                <div className="remember-div">
-                  <input type="checkbox" id="remember-checkbox" />
-                  <label htmlFor="remember-checkbox">
-                    Remember for 30 days
-                  </label>
-                </div>
-              </div>
               <div className="login-center-buttons">
                 <button type="submit">
                   {" "}

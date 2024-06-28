@@ -5,6 +5,7 @@ import Loader from "./layouts/loader/Loader.js";
 
 import LandingPage from "./pages/landingpages.jsx";
 import Login from "./pages/Login.jsx";
+import ClassTable from "./views/ui/ClassTabel.jsx";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("./layouts/FullLayout.js"));
@@ -30,6 +31,7 @@ const ThemeRoutes = [
       { path: "dashboard", element: <Navigate to="/starter" /> },
       { path: "starter", element: <Starter /> },
       { path: "modul", element: <ModulTables /> },
+      { path: "kelas", element: <ClassTable /> },
       { path: "siswa", element: <SiswaTables /> },
       { path: "guru", element: <GuruTables /> },
       { path: "post", element: <SiswaTables /> },

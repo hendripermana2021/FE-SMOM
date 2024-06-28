@@ -95,7 +95,7 @@ const GuruTables = () => {
             Jumlah Guru
           </CardSubtitle>
           <FormInputGuru />
-          <Table className="table table-hover" id="tableguru">
+          <Table className="table table-hover" id="tableguru" responsive>
             <thead>
               <tr>
                 <th>No</th>
@@ -121,7 +121,14 @@ const GuruTables = () => {
                 Guru.map((Gurus, index) => (
                   <tr key={index}>
                     <td>U {index + 1}</td>
-                    <td>{Gurus.name_guru}</td>
+                    <td>
+                      {Gurus.name_guru}{" "}
+                      {Gurus.role_id === "1" ? (
+                        <Badge bg="primary">Admin</Badge>
+                      ) : (
+                        <Badge bg="success">Guru</Badge>
+                      )}
+                    </td>
                     <td>
                       {Gurus.sex === "L" ? (
                         <Badge bg="primary">Laki Laki</Badge>

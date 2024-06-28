@@ -1,27 +1,42 @@
-import { Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
-
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  CardSubtitle,
+  Table,
+  Col,
+  Row,
+} from "react-bootstrap";
+import { Badge, Button, ButtonGroup } from "react-bootstrap";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import "datatables.net-dt/css/dataTables.dataTables.min.css";
-import "datatables.net-dt/js/dataTables.dataTables";
 import $ from "jquery";
+import "datatables.net-dt/css/jquery.dataTables.min.css";
+import "datatables.net-dt";
+import "owl.carousel/dist/assets/owl.carousel.css";
+import "owl.carousel/dist/assets/owl.theme.default.css";
 import "jquery/dist/jquery.min.js";
-import serverDev from "../../Server";
-
+import "bootstrap/dist/css/bootstrap.min.css";
 import Swal from "sweetalert2";
-import { useEffect, useState } from "react";
 import axios from "axios";
-import { Badge } from "react-bootstrap";
+import serverDev from "../../Server";
 import FormInputModal from "./forms/FormInputModul";
 import UpdateDataModul from "./forms/UpdateDataModul";
+import DetailModul from "./forms/DetailModul";
+import OwlCarousel from "react-owl-carousel";
+import { jwtDecode } from "jwt-decode";
 
 const ModulTables = () => {
-  const [Modul, setModul] = useState([]);
+  const [modulList, setModulList] = useState([]);
+  const [modulSiswa, setModulSiswa] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [roleId, setRoleId] = useState(null);
 
   useEffect(() => {
+    // DataTable initialization
     if (!$.fn.DataTable.isDataTable("#tablemodul")) {
-      $(document).ready(function () {
+      $(document).ready(() => {
         const tableInterval = setInterval(() => {
           if ($("#tablemodul").is(":visible")) {
             clearInterval(tableInterval);
@@ -31,7 +46,20 @@ const ModulTables = () => {
       });
     }
 
+    // Fetch module data
     getModul();
+    getModulSiswa();
+
+    // Decode JWT token and set roleId
+    const token = sessionStorage.getItem("accessToken");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setRoleId(decoded.role_id);
+      } catch (error) {
+        console.error("Invalid token", error);
+      }
+    }
   }, []);
 
   const getModul = async () => {
@@ -41,11 +69,44 @@ const ModulTables = () => {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
       });
-      setModul(response.data.data);
+      setModulList(response.data.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching room data:", error);
+      console.error("Error fetching modul data:", error);
       setLoading(false);
+    }
+  };
+
+  const getModulSiswa = async () => {
+    try {
+      const response = await axios.get(`${serverDev}modul/siswa`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+      });
+      setModulSiswa(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching modul data:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setSelectedRows(modulList.map((modul) => modul.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (event, modulId) => {
+    if (event.target.checked) {
+      setSelectedRows((prevSelectedRows) => [...prevSelectedRows, modulId]);
+    } else {
+      setSelectedRows((prevSelectedRows) =>
+        prevSelectedRows.filter((id) => id !== modulId)
+      );
     }
   };
 
@@ -61,99 +122,250 @@ const ModulTables = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios
-            .delete(`${serverDev}modul/delete/${modul.id}`, {
-              headers: {
-                Authorization: `Bearer ${sessionStorage.getItem(
-                  "accessToken"
-                )}`,
-              },
-            })
-            .then(() => {
-              Swal.fire("Deleted!", "Your file has been deleted.", "success");
-              getModul();
-            });
+          await axios.delete(`${serverDev}modul/delete/${modul.id}`, {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            },
+          });
+          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+          getModul();
         } catch (error) {
-          console.error("Error deleting room data:", error);
-          console.log(modul.id);
+          console.error("Error deleting modul data:", error);
           Swal.fire("Error!", "Your file has not been deleted.", "error");
         }
       }
     });
   };
 
-  return (
-    <div>
+  const deleteSelectedModul = async () => {
+    if (selectedRows.length === 0) {
+      Swal.fire("No selection", "Please select modul(s) to delete", "info");
+      return;
+    }
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete them!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await Promise.all(
+            selectedRows.map(async (modulId) => {
+              await axios.delete(`${serverDev}modul/delete/${modulId}`, {
+                headers: {
+                  Authorization: `Bearer ${sessionStorage.getItem(
+                    "accessToken"
+                  )}`,
+                },
+              });
+            })
+          );
+          Swal.fire(
+            "Deleted!",
+            "The selected modul(s) have been deleted.",
+            "success"
+          );
+          getModul();
+          setSelectedRows([]);
+        } catch (error) {
+          console.error("Error deleting modul data:", error);
+          Swal.fire(
+            "Error!",
+            "There was an error deleting the selected modul(s).",
+            "error"
+          );
+        }
+      }
+    });
+  };
+
+  const CardCarousel = () => {
+    const options = {
+      margin: 10,
+      nav: true,
+      autoplay: true,
+      autoplayTimeout: 3000,
+      smartSpeed: 500,
+      responsive: {
+        0: {
+          items: 1,
+        },
+        600: {
+          items: 2,
+        },
+        1000: {
+          items: 3,
+        },
+      },
+    };
+
+    return (
       <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">
           <i className="bi bi-bell me-2"> </i>
-          Tabel Modul
+          Modul Pembelajaran
         </CardTitle>
         <CardBody>
           <CardSubtitle className="mb-2 text-muted" tag="h6">
-            Jumlah Modul
+            Dibawah adalah materi yang diberikan oleh para guru, mohon untuk
+            dipelajari
+            <br />
+            <br />
+            <br />
           </CardSubtitle>
-          <FormInputModal />
-          <Table className="table table-hover" id="tablemodul">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="4">Loading...</td>
-                </tr>
-              ) : Modul.length === 0 ? (
-                <tr>
-                  <td colSpan="4">No Modul available</td>
-                </tr>
-              ) : (
-                Modul.map((Moduls, index) => (
-                  <tr key={index}>
-                    <td>U {index + 1}</td>
-                    <td>{Moduls.title}</td>
-                    <td>
-                      {Moduls.status_post === "active" ? (
-                        <Badge bg="success">{Moduls.status_post}</Badge>
-                      ) : (
-                        Moduls.status_post ===
-                        "unactive"(
-                          <Badge bg="danger">{Moduls.status_post}</Badge>
-                        )
-                      )}
-                    </td>
-                    <td>
-                      <DropdownButton
-                        as={ButtonGroup}
-                        key="end"
-                        id="dropdown-button-drop-end"
-                        drop="end"
-                        variant="secondary"
-                      >
-                        {/* <DetailFormEmployee emp={Moduls} /> */}
-                        <UpdateDataModul modul={Moduls} />
-
-                        <button
-                          className="dropdown-item"
-                          onClick={() => deleteModul(Moduls)}
+          <Row>
+            <Col>
+              <OwlCarousel className="owl-theme" {...options}>
+                {modulSiswa.map((modul, index) => (
+                  <div className="item" key={index}>
+                    <Card>
+                      <Card.Img
+                        variant="top"
+                        src="https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=1356&h=668&fit=crop"
+                        alt={`Slide ${index + 1}`}
+                      />
+                      <Card.Body>
+                        <Card.Title>{modul.title}</Card.Title>
+                        <Card.Text>{modul.content}</Card.Text>
+                        <DropdownButton
+                          as={ButtonGroup}
+                          key="end"
+                          id="dropdown-button-drop-end"
+                          drop="end"
+                          variant="secondary"
                         >
-                          <i className="ti-trash menu-icon me-2" />
-                          Delete
-                        </button>
-                      </DropdownButton>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </Table>
+                          <DetailModul modul={modul} />
+                        </DropdownButton>
+                      </Card.Body>
+                    </Card>
+                  </div>
+                ))}
+              </OwlCarousel>
+            </Col>
+          </Row>
         </CardBody>
       </Card>
+    );
+  };
+
+  return (
+    <div>
+      {roleId == 1 || roleId == 2 ? (
+        <Card>
+          <CardTitle tag="h6" className="border-bottom p-3 mb-0">
+            <i className="bi bi-bell me-2"></i>
+            Tabel Modul
+          </CardTitle>
+          <CardBody>
+            <ButtonGroup aria-label="Basic example">
+              <FormInputModal />
+              <Button
+                variant="danger"
+                onClick={deleteSelectedModul}
+                disabled={selectedRows.length === 0}
+              >
+                Delete
+              </Button>
+            </ButtonGroup>
+            <br />
+            <br />
+            <CardSubtitle className="mb-2 text-muted" tag="h6">
+              Jumlah Modul
+            </CardSubtitle>
+
+            <Table className="table table-hover" id="tablemodul" responsive>
+              <thead>
+                <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={
+                        selectedRows.length === modulList.length &&
+                        modulList.length > 0
+                      }
+                    />
+                  </th>
+                  <th>No</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Assigned For</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td>Loading...</td>
+                  </tr>
+                ) : modulList.length === 0 ? (
+                  <tr>
+                    <td>No Modul available</td>
+                  </tr>
+                ) : (
+                  modulList.map((modul, index) => (
+                    <tr key={modul.id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedRows.includes(modul.id)}
+                          onChange={(e) => handleSelectRow(e, modul.id)}
+                        />
+                      </td>
+                      <td>{index + 1}</td>
+                      <td>{modul.title}</td>
+                      <td>
+                        {
+                          (modul.status_post = "Active" ? (
+                            <Badge bg="success">Active</Badge>
+                          ) : (
+                            <Badge bg="danger">Unactive</Badge>
+                          ))
+                        }
+                      </td>
+                      <td>
+                        {modul.for_class == "X" ? (
+                          <Badge bg="primary">Kelas X</Badge>
+                        ) : modul.for_class == "XI" ? (
+                          <Badge bg="success">Kelas XI</Badge>
+                        ) : (
+                          <Badge bg="secondary">Kelas XII</Badge>
+                        )}
+                      </td>
+                      <td>
+                        <DropdownButton
+                          as={ButtonGroup}
+                          key="end"
+                          id="dropdown-button-drop-end"
+                          drop="end"
+                          variant="secondary"
+                        >
+                          <DetailModul modul={modul} />
+                          <UpdateDataModul modul={modul} />
+                          <button
+                            className="dropdown-item"
+                            onClick={() => deleteModul(modul)}
+                          >
+                            <i className="ti-trash menu-icon me-2"></i>
+                            Delete
+                          </button>
+                        </DropdownButton>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </Table>
+          </CardBody>
+        </Card>
+      ) : (
+        <CardCarousel />
+      )}
     </div>
   );
 };

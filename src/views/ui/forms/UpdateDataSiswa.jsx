@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import serverDev from "../../../Server";
+import { createBrowserHistory } from "history";
 
 const UpdateDataSiswa = (props) => {
   const classes = props.classes;
@@ -29,6 +30,7 @@ const UpdateDataSiswa = (props) => {
   const [status, setStatus] = useState(student.status ? student.status : "");
 
   const navigate = useNavigate();
+  const history = createBrowserHistory();
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
@@ -122,6 +124,7 @@ const UpdateDataSiswa = (props) => {
             setIsLoading("");
             navigate("/siswa");
             handleClose();
+            history.go(0);
           }
         });
     } catch (error) {

@@ -11,14 +11,28 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import serverDev from "../../../Server";
 import PropTypes from "prop-types";
+import { Container, Row } from "reactstrap";
+import { Col } from "react-bootstrap";
+import "../../../assets/css/editorPost.css";
+import { createBrowserHistory } from "history";
 
 const UpdateDataModul = ({ modul }) => {
   const [fullscreen, setFullscreen] = useState(true);
   const [show, setShow] = useState(false);
   const [title, setTitle] = useState("");
+  const [forclass, setForClass] = useState(
+    modul.for_class ? modul.for_class : ""
+  );
+  const [status, setStatus] = useState(modul.status_post ? "Active" : "");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const history = createBrowserHistory();
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
 
   useEffect(() => {
     if (modul) {
@@ -47,17 +61,21 @@ const UpdateDataModul = ({ modul }) => {
     try {
       const contentState = editorState.getCurrentContent();
       const contentHtml = draftToHtml(convertToRaw(contentState)); // Convert EditorState to HTML
+      const formData = new FormData();
+
+      formData.append("image", selectedFile);
+      formData.append("title", title);
+      formData.append("content", contentHtml);
+      formData.append("for_class", forclass);
+      formData.append("status", status);
 
       const response = await axios.put(
         `${serverDev}modul/update/${modul.id}`,
-        {
-          title: title,
-          content: contentHtml, // Send HTML content to backend
-        },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -68,6 +86,7 @@ const UpdateDataModul = ({ modul }) => {
           title: "Data Berhasil Diperbarui",
         });
         handleClose(); // Close modal after successful submission
+        history.go(0);
       } else {
         throw new Error("Failed to update modul");
       }
@@ -105,24 +124,84 @@ const UpdateDataModul = ({ modul }) => {
           <Modal.Title>Update Modul</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Group controlId="formTitle">
-            <Form.Label>Judul Modul</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Masukkan judul modul"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </Form.Group>
-          <br />
+          <Container fluid>
+            <Form.Group as={Row} className="mb-3" controlId="formTitleModul">
+              <Form.Label column sm="2">
+                Title Modul
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  type="text"
+                  placeholder="Masukkan judul modul"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row} className="mb-3" controlId="formStatusModul">
+              <Form.Label column sm="2">
+                Status
+              </Form.Label>
+              <Col sm="10">
+                <Form.Select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option hidden>Status Post Modul</option>
+                  <option value="Active">Active</option>
+                  <option value="Unactive">Unactive</option>
+                </Form.Select>
+              </Col>
+            </Form.Group>
+            <Form.Group
+              as={Row}
+              className="mb-3"
+              controlId="formClassAssignment"
+            >
+              <Form.Label column sm="2">
+                Assignment For Class
+              </Form.Label>
+              <Col sm="10">
+                <Form.Select
+                  value={forclass}
+                  onChange={(e) => setForClass(e.target.value)}
+                >
+                  <option hidden>Choose Class</option>
+                  <option key="1" value="X">
+                    Kelas X
+                  </option>
+                  <option key="2" value="XI">
+                    Kelas XI
+                  </option>
+                  <option key="3" value="XII">
+                    Kelas XII
+                  </option>
+                </Form.Select>
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row} className="mb-3" controlId="formUpdateImage">
+              <Form.Label column sm="2">
+                Modul Image
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  placeholder="Module Image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </Col>
+            </Form.Group>
+          </Container>
           <br />
           <Form.Group controlId="formContent">
             <Form.Label>Konten Modul</Form.Label>
+            <br />
             <Editor
               editorState={editorState}
               toolbarClassName="toolbarClassName"
               wrapperClassName="wrapperClassName"
-              editorClassName="editorClassName"
+              editorClassName="editorWhiteBackground"
               onEditorStateChange={onEditorStateChange}
             />
           </Form.Group>

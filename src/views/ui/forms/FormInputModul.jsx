@@ -9,14 +9,23 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import axios from "axios";
 import Swal from "sweetalert2";
 import serverDev from "../../../Server";
+import "../../../assets/css/editorPost.css";
+import { createBrowserHistory } from "history";
+import { Col, Row } from "react-bootstrap";
 
 const FormInputModal = () => {
   const [fullscreen, setFullscreen] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [show, setShow] = useState(false);
   const [title, setTitle] = useState("");
+  const [forclass, setForclass] = useState("");
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const history = createBrowserHistory();
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
 
   function handleShow(breakpoint) {
     setFullscreen(breakpoint);
@@ -29,20 +38,19 @@ const FormInputModal = () => {
     try {
       const contentState = editorState.getCurrentContent();
       const contentHtml = draftToHtml(convertToRaw(contentState)); // Convert EditorState to HTML
+      const formData = new FormData();
 
-      const response = await axios.post(
-        `${serverDev}modul/add`,
-        {
-          title: title,
-          content: contentHtml, // Send HTML content to backend
+      formData.append("image", selectedFile);
+      formData.append("title", title);
+      formData.append("content", contentHtml);
+      formData.append("for_class", forclass);
+
+      const response = await axios.post(`${serverDev}modul/add`, formData, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      });
 
       if (response.status === 201) {
         Swal.fire({
@@ -50,6 +58,7 @@ const FormInputModal = () => {
           title: "Data Berhasil Ditambahkan",
         });
         handleClose(); // Close modal after successful submission
+        history.go(0);
       } else {
         throw new Error("Failed to add modul");
       }
@@ -88,24 +97,66 @@ const FormInputModal = () => {
           <Modal.Title>Tambah Modul Baru</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Group controlId="formTitle">
-            <Form.Label>Judul Modul</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Masukkan judul modul"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+          <Form.Group as={Row} className="mb-3" controlId="formTitleModul">
+            <Form.Label column sm="2">
+              Judul Modul
+            </Form.Label>
+            <Col sm="10">
+              <Form.Control
+                type="text"
+                placeholder="Masukkan judul modul"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </Col>
           </Form.Group>
           <br />
+
+          <Form.Group as={Row} className="mb-3" controlId="formAssignedFor">
+            <Form.Label column sm="2">
+              Assigned For
+            </Form.Label>
+            <Col sm="10">
+              <Form.Select
+                value={forclass}
+                onChange={(e) => setForclass(e.target.value)}
+              >
+                <option hidden>Choose Class</option>
+                <option key="1" value="X">
+                  Kelas X
+                </option>
+                <option key="2" value="XI">
+                  Kelas XI
+                </option>
+                <option key="3" value="XII">
+                  Kelas XII
+                </option>
+              </Form.Select>
+            </Col>
+          </Form.Group>
+
+          <br />
+          <Form.Group as={Row} className="mb-3" controlId="formAssignedFor">
+            <Form.Label column sm="2">
+              Uploud Image
+            </Form.Label>
+            <Col sm="10">
+              <Form.Control
+                placeholder="Module Image"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </Col>
+          </Form.Group>
           <br />
           <Form.Group controlId="formContent">
-            <Form.Label>Konten Modul</Form.Label>
+            <Form.Label className="pe-5">Konten Modul</Form.Label>
             <Editor
               editorState={editorState}
               toolbarClassName="toolbarClassName"
               wrapperClassName="wrapperClassName"
-              editorClassName="editorClassName"
+              editorClassName="editorWhiteBackground"
               onEditorStateChange={onEditorStateChange}
             />
           </Form.Group>

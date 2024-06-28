@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import serverDev from "../../../Server";
+import { createBrowserHistory } from "history";
 
 const FormInputSiswa = ({ kelas }) => {
   const [show, setShow] = useState(false);
@@ -22,6 +23,7 @@ const FormInputSiswa = ({ kelas }) => {
   const [image, setImage] = useState(null);
 
   const navigate = useNavigate();
+  const history = createBrowserHistory();
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
@@ -114,6 +116,7 @@ const FormInputSiswa = ({ kelas }) => {
             setIsLoading("");
             navigate("/siswa");
             handleClose();
+            history.go(0);
           }
         });
     } catch (error) {
