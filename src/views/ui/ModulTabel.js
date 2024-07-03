@@ -25,6 +25,7 @@ import UpdateDataModul from "./forms/UpdateDataModul";
 import DetailModul from "./forms/DetailModul";
 import OwlCarousel from "react-owl-carousel";
 import { jwtDecode } from "jwt-decode";
+import DetailModulForSiswa from "./forms/DetailModulForSiswa";
 
 const ModulTables = () => {
   const [modulList, setModulList] = useState([]);
@@ -86,6 +87,7 @@ const ModulTables = () => {
       });
       setModulSiswa(response.data.data);
       setLoading(false);
+      console.log(response);
     } catch (error) {
       console.error("Error fetching modul data:", error);
       setLoading(false);
@@ -226,12 +228,17 @@ const ModulTables = () => {
                     <Card>
                       <Card.Img
                         variant="top"
-                        src="https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=1356&h=668&fit=crop"
+                        src={modul.image}
+                        style={{
+                          width: "100%",
+                          height: "15em",
+                          objectFit: "cover",
+                        }}
                         alt={`Slide ${index + 1}`}
                       />
                       <Card.Body>
                         <Card.Title>{modul.title}</Card.Title>
-                        <Card.Text>{modul.content}</Card.Text>
+                        <Card.Text>{modul.subtitle}</Card.Text>
                         <DropdownButton
                           as={ButtonGroup}
                           key="end"
@@ -239,7 +246,7 @@ const ModulTables = () => {
                           drop="end"
                           variant="secondary"
                         >
-                          <DetailModul modul={modul} />
+                          <DetailModulForSiswa modul={modul} />
                         </DropdownButton>
                       </Card.Body>
                     </Card>
@@ -258,7 +265,7 @@ const ModulTables = () => {
       {roleId == 1 || roleId == 2 ? (
         <Card>
           <CardTitle tag="h6" className="border-bottom p-3 mb-0">
-            <i className="bi bi-bell me-2"></i>
+            <i className="bi bi-book me-3"></i>
             Tabel Modul
           </CardTitle>
           <CardBody>

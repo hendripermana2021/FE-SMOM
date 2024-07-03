@@ -134,7 +134,7 @@ const ClassTable = () => {
     <div>
       <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">
-          <i className="bi bi-bell me-2"></i> Tabel Siswa
+          <i className="bi bi-border-all me-3"></i> Tabel Kelas
         </CardTitle>
         <CardBody>
           <ButtonGroup aria-label="Basic example">
@@ -150,7 +150,7 @@ const ClassTable = () => {
           <br />
           <br />
           <CardSubtitle className="mb-2 text-muted" tag="h6">
-            Jumlah Siswa
+            Jumlah Kelas
           </CardSubtitle>
           <Table className="table table-hover" id="tableguru" responsive>
             <thead>

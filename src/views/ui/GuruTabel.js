@@ -87,7 +87,7 @@ const GuruTables = () => {
     <div>
       <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">
-          <i className="bi bi-bell me-2"> </i>
+          <i className="bi bi-person-add me-3"> </i>
           Tabel Guru
         </CardTitle>
         <CardBody>

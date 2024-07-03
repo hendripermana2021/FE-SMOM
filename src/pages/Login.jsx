@@ -78,6 +78,7 @@ const Login = () => {
               <input
                 type="email"
                 placeholder="Email"
+                style={{ fontSize: "1.5em" }}
                 id="email"
                 required
                 value={email}
@@ -88,6 +89,7 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   id="password"
+                  style={{ fontSize: "1.5em" }}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

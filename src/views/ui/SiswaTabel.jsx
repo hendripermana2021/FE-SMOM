@@ -135,7 +135,7 @@ const SiswaTables = () => {
     <div>
       <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">
-          <i className="bi bi-bell me-2"></i> Tabel Siswa
+          <i className="bi bi-people me-3"></i> Tabel Siswa
         </CardTitle>
         <CardBody>
           <ButtonGroup aria-label="Basic example">

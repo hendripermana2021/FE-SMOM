@@ -11,13 +11,14 @@ import Swal from "sweetalert2";
 import serverDev from "../../../Server";
 import "../../../assets/css/editorPost.css";
 import { createBrowserHistory } from "history";
-import { Col, Row } from "react-bootstrap";
+import { Col, FloatingLabel, Row } from "react-bootstrap";
 
 const FormInputModal = () => {
   const [fullscreen, setFullscreen] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [show, setShow] = useState(false);
   const [title, setTitle] = useState("");
+  const [subtitle, setSubtitle] = useState("");
   const [forclass, setForclass] = useState("");
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -42,6 +43,7 @@ const FormInputModal = () => {
 
       formData.append("image", selectedFile);
       formData.append("title", title);
+      formData.append("subtitle", subtitle);
       formData.append("content", contentHtml);
       formData.append("for_class", forclass);
 
@@ -105,12 +107,28 @@ const FormInputModal = () => {
               <Form.Control
                 type="text"
                 placeholder="Masukkan judul modul"
+                style={{ height: "auto" }}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </Col>
           </Form.Group>
-          <br />
+          <Form.Group as={Row} className="mb-3" controlId="formSubtitleModul">
+            <Form.Label column sm="2">
+              Subtitle Modul
+            </Form.Label>
+            <Col sm="10">
+              <FloatingLabel controlId="floatingTextarea2" label="Subtitle">
+                <Form.Control
+                  as="textarea"
+                  placeholder="Tulis Sekilas tentang Materi"
+                  style={{ height: "100px" }}
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                />
+              </FloatingLabel>
+            </Col>
+          </Form.Group>
 
           <Form.Group as={Row} className="mb-3" controlId="formAssignedFor">
             <Form.Label column sm="2">
@@ -134,8 +152,6 @@ const FormInputModal = () => {
               </Form.Select>
             </Col>
           </Form.Group>
-
-          <br />
           <Form.Group as={Row} className="mb-3" controlId="formAssignedFor">
             <Form.Label column sm="2">
               Uploud Image
@@ -145,6 +161,7 @@ const FormInputModal = () => {
                 placeholder="Module Image"
                 type="file"
                 accept="image/*"
+                style={{ height: "auto" }}
                 onChange={handleFileChange}
               />
             </Col>

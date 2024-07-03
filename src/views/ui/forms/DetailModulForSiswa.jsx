@@ -6,10 +6,10 @@ import draftToHtml from "draftjs-to-html";
 import { EditorState, convertToRaw } from "draft-js";
 import modulPng from "../../../assets/images/modul.jpg";
 import Form from "react-bootstrap/Form"; // Correct import
-import { Col, Container, Row } from "react-bootstrap"; // Consistent use with react-bootstrap
+import { Col, Container, FloatingLabel, Row } from "react-bootstrap"; // Consistent use with react-bootstrap
 import "../../../assets/css/editorPost.css";
 
-const DetailModul = (props) => {
+const DetailModulForSiswa = (props) => {
   const modul = props.modul;
   console.log(modul);
   const [fullscreen, setFullscreen] = useState(true);
@@ -50,15 +50,15 @@ const DetailModul = (props) => {
         onHide={handleClose}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Detail Modul</Modal.Title>
+          <Modal.Title>Baca Materi</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Container fluid>
               <Row>
-                <Col xs lg={4}>
+                <Col xs lg={10}>
                   <Form.Group className="mb-3" controlId="formTitle">
-                    <Form.Label>Judul Modul</Form.Label>
+                    <Form.Label>Judul Materi</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder={modul.title || "No Title"}
@@ -68,22 +68,41 @@ const DetailModul = (props) => {
                   </Form.Group>
                 </Col>
                 <Col xs lg={2}>
-                  <Form.Group className="mb-3" controlId="formStatus">
-                    <Form.Label>Status Post</Form.Label>
+                  <Form.Group className="mb-3" controlId="formTitle">
+                    <Form.Label>Pemberi Materi</Form.Label>
                     <Form.Control
                       type="text"
-                      placeholder={modul.status_post || ""}
-                      defaultValue={modul.status_post}
+                      placeholder={modul.publisher.name_guru || "No Title"}
+                      defaultValue={modul.publisher.name_guru}
                       readOnly
                     />
                   </Form.Group>
-                  <br />
                 </Col>
+                <br />
+              </Row>
+              <Row>
+                <Col xs lg={10}>
+                  <Form.Group className="mb-3" controlId="formTitle">
+                    <FloatingLabel
+                      controlId="floatingTextarea2"
+                      label="Subtitle Materi"
+                    >
+                      <Form.Control
+                        as="textarea"
+                        placeholder={modul.subtitle || "No Title"}
+                        defaultValue={modul.subtitle}
+                        style={{ height: "100px" }}
+                        readOnly
+                      />
+                    </FloatingLabel>
+                  </Form.Group>
+                </Col>
+                <br />
               </Row>
               <Row>
                 <Col xs lg={4}>
                   <Form.Group controlId="formImage">
-                    <Form.Label>Image Modul</Form.Label>
+                    <Form.Label>Image Materi</Form.Label>
                     <div className="text-center">
                       <img
                         src={modul.image || modulPng}
@@ -109,7 +128,7 @@ const DetailModul = (props) => {
               </Row>
               <Row>
                 <Form.Group className="mb-3" controlId="formContent">
-                  <Form.Label>Konten Modul</Form.Label>
+                  <Form.Label>Content Materi</Form.Label>
                   <br />
                   <div className="editorWhiteBackground">
                     <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
@@ -129,8 +148,8 @@ const DetailModul = (props) => {
   );
 };
 
-DetailModul.propTypes = {
+DetailModulForSiswa.propTypes = {
   modul: PropTypes.object,
 };
 
-export default DetailModul;
+export default DetailModulForSiswa;

@@ -9,7 +9,7 @@ const navigationAdmin = [
   {
     title: "Dashboard",
     href: "/starter",
-    icon: "bi bi-layout-split",
+    icon: "bi bi-browser-edge",
   },
   {
     title: "Daftar Modul",
@@ -19,7 +19,7 @@ const navigationAdmin = [
   {
     title: "Daftar Kelas",
     href: "/kelas",
-    icon: "bi bi-people",
+    icon: "bi bi-border-all",
   },
   {
     title: "Daftar Siswa",
@@ -37,7 +37,7 @@ const navigationGuru = [
   {
     title: "Dashboard",
     href: "/starter",
-    icon: "bi bi-layout-split",
+    icon: "bi bi-browser-edge",
   },
   {
     title: "Daftar Modul",
@@ -55,7 +55,7 @@ const navigationSiswa = [
   {
     title: "Dashboard",
     href: "/starter",
-    icon: "bi bi-layout-split",
+    icon: "bi bi-browser-edge",
   },
 ];
 

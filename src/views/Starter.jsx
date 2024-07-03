@@ -52,6 +52,7 @@ const Starter = () => {
                 bg="bg-light-success text-success"
                 title="Jumlah Siswa"
                 subtitle="Jumlah Siswa"
+                style={{ padding: "20" }}
                 earning={dashboard.siswaCount}
                 icon="bi bi-people"
               />
@@ -62,7 +63,7 @@ const Starter = () => {
                 title="Jumlah Modul"
                 subtitle="Jumlah Modul"
                 earning={dashboard.modulCount}
-                icon="bi bi-coin"
+                icon="bi bi-book-fill"
               />
             </Col>
             <Col sm="6" lg="3">
@@ -71,7 +72,7 @@ const Starter = () => {
                 title="Kelas"
                 subtitle="Kelas Diampuh"
                 earning={dashboard.kelasCount}
-                icon="bi bi-basket3"
+                icon="bi bi-border-all"
               />
             </Col>
             <Col sm="6" lg="3">
@@ -80,7 +81,7 @@ const Starter = () => {
                 title="Guru"
                 subtitle="Jumlah Guru"
                 earning={dashboard.guruCount}
-                icon="bi bi-bag"
+                icon="bi bi-people"
               />
             </Col>
           </>
